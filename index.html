@@ -267,37 +267,46 @@
         const apiKey = localStorage.getItem("openai_api_key");
         
         // Send request to backend
-        fetch(API_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            question: question,
-            api_key: apiKey
-          }),
-        })
-        .then(response => response.json())
-        .then(data => {
-          // Update UI with response
-          statusMessage.textContent = "Response received";
-          responseDiv.innerHTML += `<div class="answer"><strong>AI Candidate:</strong> ${data.answer}</div>`;
-          
-          // Read response aloud
-          const speech = new SpeechSynthesisUtterance(data.answer);
-          speech.lang = 'en-US';
-          window.speechSynthesis.speak(speech);
-        })
-        .catch(error => {
-          console.error("Error:", error);
-          statusMessage.textContent = "Error communicating with server";
-          responseDiv.innerHTML += `<div class="error">Error: ${error.message}</div>`;
-        })
-        .finally(() => {
-          talkBtn.disabled = false;
-        });
-      };
-      
+        // Replace the fetch section in your index.html with this improved version
+      fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          question: question,
+          api_key: apiKey
+        }),
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        // Update UI with response
+        statusMessage.textContent = "Response received";
+        responseDiv.innerHTML += `<div class="answer"><strong>AI Candidate:</strong> ${data.answer}</div>`;
+        
+        // Read response aloud
+        const speech = new SpeechSynthesisUtterance(data.answer);
+        speech.lang = 'en-US';
+        window.speechSynthesis.speak(speech);
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        statusMessage.textContent = "Error communicating with server";
+        responseDiv.innerHTML += `<div class="error">Error: ${error.message}</div>`;
+        
+        // Try to get more detailed error information
+        if (error.name === 'SyntaxError') {
+          responseDiv.innerHTML += `<div class="error">JSON parsing error. The server might be returning invalid JSON.</div>`;
+        }
+      })
+      .finally(() => {
+        talkBtn.disabled = false;
+      });      
       recognition.onerror = (event) => {
         console.error("Speech Recognition Error:", event.error);
         statusMessage.textContent = `Error recognizing speech: ${event.error}`;
