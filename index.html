@@ -155,6 +155,7 @@
     <button id="talk-btn">Start Interview Question</button>
     <p id="status-message" class="status"></p>
     <div id="response"></div>
+    <button id="test-btn" style="margin-left: 10px; background-color: #4caf50;">Test API</button>
   </div>
   
   <div class="deployment-mode" id="deployment-mode"></div>
@@ -320,6 +321,28 @@
         talkBtn.disabled = false;
       };
     }
+      document.getElementById("test-btn").addEventListener("click", () => {
+  statusMessage.textContent = "Testing API connection...";
+  
+  fetch("/api/test", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ test: true })
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log("Test response:", data);
+    responseDiv.innerHTML = `<div><strong>Test Response:</strong> ${JSON.stringify(data)}</div>`;
+    statusMessage.textContent = "Test completed successfully";
+  })
+  .catch(error => {
+    console.error("Test Error:", error);
+    responseDiv.innerHTML = `<div class="error">Test Error: ${error.message}</div>`;
+    statusMessage.textContent = "Test failed";
+  });
+});
   </script>
 </body>
 </html>
