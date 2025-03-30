@@ -1,8 +1,11 @@
 {
-    "name": "home-llc-interview-bot",
-    "version": "1.0.0",
-    "description": "Home.LLC Voice Bot Interview",
-    "dependencies": {
-      "openai": "^4.0.0"
-    }
+  "name": "home-llc-interview-bot",
+  "version": "1.0.0",
+  "description": "Home.LLC Voice Bot Interview",
+  "dependencies": {
+    "openai": "^4.0.0"
+  },
+  "devDependencies": {
+    "@netlify/functions": "^1.6.0"
   }
+}
