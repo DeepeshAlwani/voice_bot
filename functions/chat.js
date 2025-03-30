@@ -1,11 +1,11 @@
 const { OpenAI } = require('openai');
 
 exports.handler = async function(event, context) {
-  // Enable CORS
+  // Enhanced CORS headers
   const headers = {
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
     'Content-Type': 'application/json'
   };
   
@@ -19,6 +19,9 @@ exports.handler = async function(event, context) {
   }
   
   try {
+    // Log the incoming request for debugging
+    console.log('Request body:', event.body);
+    
     // Parse request body
     const data = JSON.parse(event.body);
     const question = data.question || '';
@@ -54,20 +57,28 @@ exports.handler = async function(event, context) {
       temperature: 0.7,
     });
     
+    const answer = response.choices[0].message.content.trim();
+    console.log('OpenAI response:', answer);
+    
     // Return the response
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({ answer: response.choices[0].message.content.trim() })
+      body: JSON.stringify({ answer })
     };
     
   } catch (error) {
     console.error('Error:', error);
     
+    // More detailed error response
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ answer: `I apologize, but I encountered an error: ${error.message}` })
+      body: JSON.stringify({ 
+        answer: `I apologize, but I encountered an error: ${error.message}`,
+        error: error.message,
+        stack: error.stack
+      })
     };
   }
 };
